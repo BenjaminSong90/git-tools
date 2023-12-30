@@ -1,4 +1,4 @@
-module git_tools
+module github.com/BenjaminSong90/git-tools
 
 go 1.19
 

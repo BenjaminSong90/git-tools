@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"git_tools/commands"
 	"os"
 
+	"github.com/BenjaminSong90/git-tools/commands"
 	"github.com/jessevdk/go-flags"
 )
 
