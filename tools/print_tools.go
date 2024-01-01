@@ -2,10 +2,10 @@ package tools
 
 import "fmt"
 
-type PrintColor int
+type printColor int
 
 const (
-	Red     PrintColor = iota // 0
+	Red     printColor = iota // 0
 	Green                     // 1（自动递增）
 	Yellow                    // 2
 	Blue                      // 3
@@ -14,7 +14,7 @@ const (
 	White                     // 6
 )
 
-func (color PrintColor) formatTextColor(info string) (formatString string) {
+func (color printColor) formatTextColor(info string) (formatString string) {
 	switch color {
 	case Red:
 		formatString = fmt.Sprintf("\x1b[31m %s \x1b[0m", info)
@@ -37,6 +37,6 @@ func (color PrintColor) formatTextColor(info string) (formatString string) {
 	return
 }
 
-func Println(info string, color PrintColor) {
+func Println(info string, color printColor) {
 	fmt.Println(color.formatTextColor(info))
 }

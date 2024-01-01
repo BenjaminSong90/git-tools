@@ -3,7 +3,6 @@ package commands
 // 通用的helper
 
 import (
-	"encoding/json"
 	"path/filepath"
 
 	"github.com/BenjaminSong90/git-tools/data"
@@ -34,13 +33,12 @@ func LoadGitToolsBranchInfo(rootPath string) (*data.BranchInfo, error) {
 
 }
 
+func WirteGitToolsBranchInfo(branchInfo *data.BranchInfo, rootPath string) error {
+	return tools.WriteJsonData2File[data.BranchInfo](branchInfo, filepath.Join(rootPath, tools.BranchInfoFileName))
+}
+
 // 初始化 .git-tools 文件夹下的文件
 func InitGitToolsBranchInfoFile(rootDirPath string) error {
-	newFile, err := tools.CreateFileByPath(filepath.Join(rootDirPath, tools.BranchInfoFileName))
-	if err != nil {
-		return nil
-	}
-	defer newFile.Close()
 
 	branches, err := getLocalBranches()
 	if err != nil {
@@ -52,14 +50,8 @@ func InitGitToolsBranchInfoFile(rootDirPath string) error {
 		Branches:     branches,
 		BranchGroups: []data.BranchGroup{},
 	}
-	// 将结构体转换为 JSON 字符串
-	jsonByte, err := json.Marshal(branchInfo)
-	if err != nil {
-		return nil
-	}
 
-	_, err = newFile.Write(jsonByte)
-	return err
+	return tools.WriteJsonData2File(&branchInfo, filepath.Join(rootDirPath, tools.BranchInfoFileName))
 }
 
 // 获取本地的git branch 信息

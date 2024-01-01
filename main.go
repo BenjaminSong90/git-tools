@@ -9,7 +9,6 @@ import (
 )
 
 type Option struct {
-	Value       bool                        `short:"v"`
 	Init        commands.InitCommand        `command:"init"`
 	Branch      commands.BranchCommand      `command:"branch"`
 	Verify      commands.VerifyCommand      `command:"verify"`
@@ -18,6 +17,8 @@ type Option struct {
 
 func main() {
 	var opt Option
+	opt.Branch.OnAttach()
+
 	parser := flags.NewParser(&opt, flags.HelpFlag)
 	var err error
 	if len(os.Args) == 1 {

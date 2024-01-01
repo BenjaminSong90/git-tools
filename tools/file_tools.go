@@ -61,13 +61,6 @@ func IsFileExistsAlongPath(dirPath string, fileName string) (bool, string, int) 
 	return false, "", deepth // 文件不存在
 }
 
-// 通过文件路径创建文件
-func CreateFileByPath(filePath string) (*os.File, error) {
-	newFile, err := os.Create(filePath)
-
-	return newFile, err
-}
-
 // 加载本地文件json数据
 func LoadFileJsonData[T any](filePath string) (*T, error) {
 	data, err := os.ReadFile(filePath)
@@ -84,4 +77,16 @@ func LoadFileJsonData[T any](filePath string) (*T, error) {
 	}
 
 	return &result, nil
+}
+
+func WriteJsonData2File[T any](data *T, filepath string) error {
+
+	// 将结构体转换为 JSON 字符串
+	jsonByte, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		return err
+	}
+
+	os.WriteFile(filepath, jsonByte, 0644)
+	return err
 }
