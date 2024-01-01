@@ -1,12 +1,9 @@
 package commands
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 
-	"github.com/BenjaminSong90/git-tools/data"
-	"github.com/BenjaminSong90/git-tools/executer"
 	"github.com/BenjaminSong90/git-tools/tools"
 )
 
@@ -19,14 +16,14 @@ func (command *InitCommand) Execute(args []string) error {
 		return err
 	}
 
-	gitExist, _ := FindDotGitFolder(pwd)
+	gitExist, _, _ := FindDotGitFolder(pwd)
 
 	if !gitExist {
 		tools.Println("Please initialize git first! \n : git init", tools.Red)
 		return nil
 	}
-	exist, realPath := FindDotGitToolsFolder(pwd)
-	if exist {
+	exist, realPath, deepth := FindDotGitToolsFolder(pwd)
+	if exist && deepth == 0 {
 		tools.Println("Reinitialized existing Git-tools repository in "+realPath, tools.Green)
 		// TODO 添加再次初始化的逻辑
 	} else {
@@ -37,45 +34,8 @@ func (command *InitCommand) Execute(args []string) error {
 			return err
 		}
 
-		return initGitToolsFiles(dotGitFolderName)
+		return InitGitToolsBranchInfoFile(dotGitFolderName)
 	}
 
 	return nil
-}
-
-// 初始化 .git-tools 文件夹下的文件
-func initGitToolsFiles(rootDirPath string) error {
-	newFile, err := tools.CreateFileByPath(filepath.Join(rootDirPath, tools.BranchInfoFileName))
-	if err != nil {
-		return nil
-	}
-	defer newFile.Close()
-
-	localBranches, err := executer.GetLocalAllBranch()
-
-	if err != nil {
-		return err
-	}
-
-	branches := []data.Branch{}
-	for _, b := range localBranches {
-		bd := data.Branch{
-			Name: b,
-		}
-		branches = append(branches, bd)
-	}
-
-	branchInfo := data.BranchInfo{
-		Version:      tools.BranchInfoVersion,
-		Branches:     branches,
-		BranchGroups: []data.BranchGroup{},
-	}
-	// 将结构体转换为 JSON 字符串
-	jsonByte, err := json.Marshal(branchInfo)
-	if err != nil {
-		return nil
-	}
-
-	_, err = newFile.Write(jsonByte)
-	return err
 }

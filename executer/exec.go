@@ -1,6 +1,8 @@
 package executer
 
-import "strings"
+import (
+	"strings"
+)
 
 // 获取本地的分支
 func GetLocalAllBranch() ([]string, error) {
@@ -9,9 +11,13 @@ func GetLocalAllBranch() ([]string, error) {
 		return nil, err
 	}
 	resultStr := strings.TrimSpace(string(resultByte))
-	currentBranches := strings.Split(resultStr, "\n")
 
-	var localBranhes []string
+	localBranhes := []string{}
+
+	if len(resultStr) == 0 {
+		return localBranhes, nil
+	}
+	currentBranches := strings.Split(resultStr, "\n")
 
 	for _, branch := range currentBranches {
 		if strings.HasPrefix(branch, "*") {

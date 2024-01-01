@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 )
@@ -32,8 +33,9 @@ func IsPathExists(path string) bool {
 }
 
 // 检查文件是否存在路径目录中
-func IsFileExistsAlongPath(dirPath string, fileName string) (bool, string) {
+func IsFileExistsAlongPath(dirPath string, fileName string) (bool, string, int) {
 	dir := dirPath
+	deepth := 0
 
 	for {
 		fullPath := filepath.Join(dir, fileName)
@@ -41,10 +43,10 @@ func IsFileExistsAlongPath(dirPath string, fileName string) (bool, string) {
 		// 检查文件是否存在
 		_, err := os.Stat(fullPath)
 		if err == nil {
-			return true, fullPath // 文件存在
+			return true, fullPath, deepth // 文件存在
 		}
 		if !os.IsNotExist(err) {
-			return false, "" // 其他错误，假定文件不存在
+			return false, "", deepth // 其他错误，假定文件不存在
 		}
 
 		// 获取上级目录
@@ -53,9 +55,10 @@ func IsFileExistsAlongPath(dirPath string, fileName string) (bool, string) {
 			break // 到达根目录，退出循环
 		}
 		dir = parent
+		deepth++
 	}
 
-	return false, "" // 文件不存在
+	return false, "", deepth // 文件不存在
 }
 
 // 通过文件路径创建文件
@@ -63,4 +66,22 @@ func CreateFileByPath(filePath string) (*os.File, error) {
 	newFile, err := os.Create(filePath)
 
 	return newFile, err
+}
+
+// 加载本地文件json数据
+func LoadFileJsonData[T any](filePath string) (*T, error) {
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+
+		return nil, err
+	}
+
+	// 解析 JSON 数据到结构体
+	var result T
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
