@@ -64,13 +64,13 @@ func branchVerify() {
 	} else {
 		removeAndAddBranches(recoedBranchInfo, branches)
 
+		removeBranchFromGroup(recoedBranchInfo)
+
 		err = WirteGitToolsBranchInfo(recoedBranchInfo, folderPath)
 
 		if err != nil {
 			tools.Println("branch verify error : "+err.Error(), tools.Red)
 		}
-
-		//TODO 处理branch分组的数据
 	}
 }
 
@@ -100,4 +100,38 @@ func removeAndAddBranches(branchInfo *data.BranchInfo, localBranches []data.Bran
 
 	branchInfo.Branches = notDeletedBranches
 
+}
+
+// 从group 中移除已经被删掉的branch
+func removeBranchFromGroup(branchInfo *data.BranchInfo) {
+	recordBranchMap := make(map[string]bool)
+
+	for _, b := range branchInfo.Branches {
+		recordBranchMap[b.Name] = true
+	}
+
+	branchGroupHasOwner := []data.BranchGroup{}
+
+	// 过滤没有owner 的group并添加到数组里
+	for _, bg := range branchInfo.BranchGroups {
+		if _, ok := recordBranchMap[bg.Owner.Name]; ok {
+			branchGroupHasOwner = append(branchGroupHasOwner, bg)
+		}
+	}
+
+	branchInfo.BranchGroups = branchGroupHasOwner
+
+	// 移除分组中已经被移除的branch
+	for i := range branchGroupHasOwner {
+		bg := &branchInfo.BranchGroups[i]
+		bArray := []data.Branch{}
+
+		for j := range bg.Branches {
+			b := &bg.Branches[j]
+			if _, ok := recordBranchMap[b.Name]; ok {
+				bArray = append(bArray, *b)
+			}
+		}
+		bg.Branches = bArray
+	}
 }
