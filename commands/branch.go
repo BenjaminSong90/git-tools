@@ -11,14 +11,20 @@ import (
 
 type BranchCommand struct {
 	Verify   func() `long:"verify"`
-	Describe string `long:"describe"`
+	Describe string `long:"describe" description:"branch describe" default:""`
 	Name     string `long:"name" description:"branch name" default:""`
+
+	hasCommandExec bool
 }
 
 func (command *BranchCommand) Execute(args []string) error {
+
 	if command.Describe != "" || command.Name != "" {
-		command.setBranchDescribe(command.Name, command.Describe)
-	} else {
+		command.hasCommandExec = true
+		setBranchDescribe(command.Name, command.Describe)
+	}
+
+	if !command.hasCommandExec {
 		showBranchInfo()
 	}
 
@@ -26,7 +32,10 @@ func (command *BranchCommand) Execute(args []string) error {
 }
 
 func (command *BranchCommand) OnAttach() {
-	command.Verify = branchVerify
+	command.Verify = func() {
+		command.hasCommandExec = true
+		branchVerify()
+	}
 }
 
 // 分支检查
@@ -72,7 +81,7 @@ func branchVerify() {
 }
 
 // 设置分支描述
-func (command *BranchCommand) setBranchDescribe(name, desc string) {
+func setBranchDescribe(name, desc string) {
 	if name == "" && desc == "" {
 		return
 	}
