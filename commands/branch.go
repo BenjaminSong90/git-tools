@@ -46,7 +46,7 @@ func branchVerify() {
 	recoedBranchInfo, err := LoadGitToolsBranchInfo(folderPath)
 
 	if err != nil {
-		tools.Println("git-tools info is error,please execute 'verify' \n error info : "+err.Error(), tools.Red)
+		tools.Println("local branch info is error,please execute 'verify' \n error info : "+err.Error(), tools.Red)
 		return
 	}
 
@@ -91,7 +91,7 @@ func (command *BranchCommand) setBranchDescribe(name, desc string) {
 	recoedBranchInfo, err := LoadGitToolsBranchInfo(folderPath)
 
 	if err != nil {
-		tools.Println("git-tools info is error,please execute 'verify' \n error info : "+err.Error(), tools.Red)
+		tools.Println("local branch info is error,please execute 'verify' \n error info : "+err.Error(), tools.Red)
 		return
 	}
 
@@ -114,6 +114,7 @@ func (command *BranchCommand) setBranchDescribe(name, desc string) {
 	}
 }
 
+// 显示branch 信息
 func showBranchInfo() {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -130,7 +131,7 @@ func showBranchInfo() {
 	recoedBranchInfo, err := LoadGitToolsBranchInfo(folderPath)
 
 	if err != nil {
-		tools.Println("git-tools info is error,please execute 'verify' \n error info : "+err.Error(), tools.Red)
+		tools.Println("local branch info is error,please execute 'verify' \n error info : "+err.Error(), tools.Red)
 		return
 	}
 
