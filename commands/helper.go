@@ -3,6 +3,8 @@ package commands
 // 通用的helper
 
 import (
+	"errors"
+	"os"
 	"path/filepath"
 
 	"github.com/BenjaminSong90/git-tools/data"
@@ -89,4 +91,23 @@ func VerifyGitToolsEnv(path string) bool {
 		tools.Println("Please initialize git-tools first! \n git-tools init", tools.Red)
 	}
 	return gitToolsExits
+}
+
+// 获取 branchinfo 有效的数据 和 路径
+func getValidBranchInfoAndPath() (branchInfo *data.BranchInfo, path string, err error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		tools.Println("branch verify error : "+err.Error(), tools.Red)
+		return nil, "", err
+	}
+
+	if !VerifyGitToolsEnv(wd) {
+		return nil, "", errors.New("env is error")
+	}
+
+	_, path, _ = FindDotGitToolsFolder(wd)
+
+	branchInfo, err = LoadGitToolsBranchInfo(path)
+
+	return
 }

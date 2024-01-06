@@ -1,5 +1,7 @@
 package data
 
+import "errors"
+
 type BranchInfo struct {
 	Version      int           `json:"version"`
 	Branches     []Branch      `json:"branches"`
@@ -95,4 +97,76 @@ func (branchInfo *BranchInfo) SetBranchDesc(name, desc string) {
 			b.Describe = desc
 		}
 	}
+}
+
+// 向group添加 branch, 会掉重复的
+func (group *BranchGroup) addBranch(branchName ...string) {
+	group.Branches = append(group.Branches, branchName...)
+	group.Branches = removeDuplicates(group.Branches)
+}
+
+// 创建group
+func (branchInfo *BranchInfo) CreateGroup(name, owner string, branches []string) error {
+	branchNameMap := *branchInfo.getBranchNameMap()
+
+	if _, ok := branchNameMap[owner]; !ok {
+		return errors.New("owner branch '" + owner + "' cannot find")
+	}
+
+	groupMap := *branchInfo.getGroupMap()
+
+	validBranch := []string{}
+
+	for _, b := range branches {
+		if _, ok := branchNameMap[owner]; ok {
+			validBranch = append(validBranch, b)
+		}
+	}
+
+	if groupP, ok := groupMap[name]; ok {
+		groupP.addBranch(validBranch...)
+	} else {
+		branchInfo.BranchGroups = append(branchInfo.BranchGroups, BranchGroup{
+			Name:     name,
+			Owner:    owner,
+			Branches: validBranch,
+			Describe: "",
+		})
+	}
+
+	return nil
+
+}
+
+func (branchInfo *BranchInfo) getBranchNameMap() *map[string]bool {
+	branchNameMap := make(map[string]bool)
+	for _, branch := range branchInfo.Branches {
+		branchNameMap[branch.Name] = true
+	}
+
+	return &branchNameMap
+}
+
+func (branchInfo *BranchInfo) getGroupMap() *map[string]*BranchGroup {
+	branchNameMap := make(map[string]*BranchGroup)
+	for i := range branchInfo.BranchGroups {
+		bg := &branchInfo.BranchGroups[i]
+		branchNameMap[bg.Name] = bg
+	}
+
+	return &branchNameMap
+}
+
+func removeDuplicates(strings []string) []string {
+	encountered := map[string]bool{}
+	result := []string{}
+
+	for _, v := range strings {
+		if !encountered[v] {
+			encountered[v] = true
+			result = append(result, v)
+		}
+	}
+
+	return result
 }

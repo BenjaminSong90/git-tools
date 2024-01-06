@@ -18,6 +18,7 @@ type Option struct {
 func main() {
 	var opt Option
 	opt.Branch.OnAttach()
+	opt.BranchGroup.OnAttach()
 
 	parser := flags.NewParser(&opt, flags.HelpFlag)
 	var err error
