@@ -31,3 +31,14 @@ func GetLocalAllBranch() ([]string, error) {
 
 	return localBranhes, nil
 }
+
+// 获取当前分支
+func GetCurrentBranch() (string, error) {
+	resultByte, err := ExecuteCommand("git branch --show-current").Output()
+	if err != nil {
+		return "", err
+	}
+	resultStr := strings.TrimSpace(string(resultByte))
+
+	return resultStr, nil
+}

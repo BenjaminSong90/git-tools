@@ -86,3 +86,13 @@ func (branchInfo *BranchInfo) VerifyGroupBranch() {
 		bg.Branches = bArray
 	}
 }
+
+// 设置分支的描述
+func (branchInfo *BranchInfo) SetBranchDesc(name, desc string) {
+	for i := range branchInfo.Branches {
+		b := &branchInfo.Branches[i]
+		if b.Name == name {
+			b.Describe = desc
+		}
+	}
+}
