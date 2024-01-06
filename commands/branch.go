@@ -48,7 +48,13 @@ func branchVerify() {
 		return
 	}
 
-	recoedBranchInfo.Verify(branches)
+	bn := []string{}
+
+	for _, b := range *branches {
+		bn = append(bn, b.Name)
+	}
+
+	recoedBranchInfo.Verify(&bn)
 
 	err = WirteGitToolsBranchInfo(recoedBranchInfo, folderPath)
 

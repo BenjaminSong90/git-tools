@@ -14,18 +14,18 @@ type Branch struct {
 type BranchGroup struct {
 	Name     string   `json:"name"`
 	Describe string   `json:"describe"`
-	Owner    Branch   `json:"owner"`
-	Branches []Branch `json:"branches"`
+	Owner    string   `json:"owner"`
+	Branches []string `json:"branches"`
 }
 
 // 检查分支，移除不存在的分支
-func (branchInfo *BranchInfo) Verify(newBranches *[]Branch) {
+func (branchInfo *BranchInfo) Verify(newBranches *[]string) {
 	branchInfo.VerifyBranch(newBranches)
 	branchInfo.VerifyGroupBranch()
 }
 
 // 检查分支，移除不存在的分支
-func (branchInfo *BranchInfo) VerifyBranch(newBranches *[]Branch) {
+func (branchInfo *BranchInfo) VerifyBranch(newBranches *[]string) {
 	recordBranchMap := make(map[string]Branch)
 
 	if newBranches == nil {
@@ -40,10 +40,13 @@ func (branchInfo *BranchInfo) VerifyBranch(newBranches *[]Branch) {
 	notDeletedBranches := []Branch{}
 
 	for _, b := range *newBranches {
-		if ndb, ok := recordBranchMap[b.Name]; ok {
+		if ndb, ok := recordBranchMap[b]; ok {
 			notDeletedBranches = append(notDeletedBranches, ndb)
 		} else {
-			notDeletedBranches = append(notDeletedBranches, b)
+			notDeletedBranches = append(notDeletedBranches, Branch{
+				Name:     b,
+				Describe: "",
+			})
 		}
 	}
 
@@ -62,7 +65,7 @@ func (branchInfo *BranchInfo) VerifyGroupBranch() {
 
 	// 过滤有owner的group并添加到数组里
 	for _, bg := range branchInfo.BranchGroups {
-		if _, ok := recordBranchMap[bg.Owner.Name]; ok {
+		if _, ok := recordBranchMap[bg.Owner]; ok {
 			branchGroupHasOwner = append(branchGroupHasOwner, bg)
 		}
 	}
@@ -72,12 +75,12 @@ func (branchInfo *BranchInfo) VerifyGroupBranch() {
 	// 移除分组中已经被移除的branch
 	for i := range branchGroupHasOwner {
 		bg := &branchInfo.BranchGroups[i]
-		bArray := []Branch{}
+		bArray := []string{}
 
 		for j := range bg.Branches {
-			b := &bg.Branches[j]
-			if _, ok := recordBranchMap[b.Name]; ok && b.Name != bg.Owner.Name {
-				bArray = append(bArray, *b)
+			b := bg.Branches[j]
+			if _, ok := recordBranchMap[b]; ok && b != bg.Owner {
+				bArray = append(bArray, b)
 			}
 		}
 		bg.Branches = bArray
