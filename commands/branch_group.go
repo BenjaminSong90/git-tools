@@ -7,11 +7,13 @@ type BranchGroupCommand struct {
 	Name        string   `long:"name" short:"n" description:"group name"`
 	Branches    []string `long:"branches" short:"b" description:"branch list for add or remove"`
 	Description string   `long:"description" short:"d" description:"group describe"`
+	Add         string   `long:"add" short:"a" description:"add branch to group"`
 }
 
 func (command *BranchGroupCommand) Execute(args []string) error {
 	command.create(command.Name, command.Owner, command.Branches)
 	command.setDesc(command.Name, command.Description)
+	command.addBranch(command.Add, command.Branches)
 	return nil
 }
 
@@ -59,6 +61,7 @@ func (command *BranchGroupCommand) setDesc(name string, desc string) {
 	branchInfo, gitToolsFolderPath, err := getValidBranchInfoAndPath()
 
 	if err != nil {
+		tools.Println("load branch info error : "+err.Error(), tools.Red)
 		return
 	}
 
@@ -68,6 +71,33 @@ func (command *BranchGroupCommand) setDesc(name string, desc string) {
 
 	if err != nil {
 		tools.Println("set group desc error : "+err.Error(), tools.Red)
+	}
+
+}
+
+func (command *BranchGroupCommand) addBranch(groupName string, branches []string) {
+	if groupName == "" {
+		return
+	}
+
+	if len(branches) == 0 {
+		tools.Println("branch is empty", tools.Red)
+		return
+	}
+
+	branchInfo, gitToolsFolderPath, err := getValidBranchInfoAndPath()
+
+	if err != nil {
+		tools.Println("load branch info error : "+err.Error(), tools.Red)
+		return
+	}
+
+	branchInfo.AddBranchToGroup(groupName, branches)
+
+	err = WirteGitToolsBranchInfo(branchInfo, gitToolsFolderPath)
+
+	if err != nil {
+		tools.Println("add branch error : "+err.Error(), tools.Red)
 	}
 
 }

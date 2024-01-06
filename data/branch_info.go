@@ -105,9 +105,9 @@ func (group *BranchGroup) addBranch(branchName ...string) {
 	group.Branches = RemoveDuplicates(group.Branches)
 }
 
-// 创建group
+// 设置group 描述
 func (branchInfo *BranchInfo) SetGroupDesc(name, desc string) {
-	groupMap := *branchInfo.getGroupMap()
+	groupMap := branchInfo.getGroupMap()
 	if groupP, ok := groupMap[name]; ok {
 		groupP.Description = desc
 	}
@@ -122,7 +122,7 @@ func (branchInfo *BranchInfo) CreateGroup(name, owner string, branches []string)
 		return errors.New("owner branch '" + owner + "' cannot find")
 	}
 
-	groupMap := *branchInfo.getGroupMap()
+	groupMap := branchInfo.getGroupMap()
 
 	validBranch := []string{}
 
@@ -147,6 +147,28 @@ func (branchInfo *BranchInfo) CreateGroup(name, owner string, branches []string)
 
 }
 
+func (branchInfo *BranchInfo) AddBranchToGroup(groupName string, branches []string) {
+	branches = RemoveDuplicates(branches)
+
+	groupMap := branchInfo.getGroupMap()
+	groupP, ok := groupMap[groupName]
+	if !ok {
+		return
+	}
+
+	branchNameMap := *branchInfo.getBranchNameMap()
+
+	validBranch := []string{}
+	for _, b := range branches {
+		if _, ok := branchNameMap[b]; ok && groupP.Name != b {
+			validBranch = append(validBranch, b)
+		}
+	}
+
+	groupP.addBranch(validBranch...)
+
+}
+
 func (branchInfo *BranchInfo) getBranchNameMap() *map[string]bool {
 	branchNameMap := make(map[string]bool)
 	for _, branch := range branchInfo.Branches {
@@ -156,14 +178,14 @@ func (branchInfo *BranchInfo) getBranchNameMap() *map[string]bool {
 	return &branchNameMap
 }
 
-func (branchInfo *BranchInfo) getGroupMap() *map[string]*BranchGroup {
+func (branchInfo *BranchInfo) getGroupMap() map[string]*BranchGroup {
 	branchNameMap := make(map[string]*BranchGroup)
 	for i := range branchInfo.BranchGroups {
 		bg := &branchInfo.BranchGroups[i]
 		branchNameMap[bg.Name] = bg
 	}
 
-	return &branchNameMap
+	return branchNameMap
 }
 
 func RemoveDuplicates(strings []string) []string {

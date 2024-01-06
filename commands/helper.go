@@ -97,7 +97,6 @@ func VerifyGitToolsEnv(path string) bool {
 func getValidBranchInfoAndPath() (branchInfo *data.BranchInfo, path string, err error) {
 	wd, err := os.Getwd()
 	if err != nil {
-		tools.Println("branch verify error : "+err.Error(), tools.Red)
 		return nil, "", err
 	}
 
