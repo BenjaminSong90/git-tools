@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/BenjaminSong90/git-tools/executer"
@@ -14,7 +16,12 @@ type BranchCommand struct {
 }
 
 func (command *BranchCommand) Execute(args []string) error {
-	command.setBranchDescribe(command.Name, command.Describe)
+	if command.Describe != "" || command.Name != "" {
+		command.setBranchDescribe(command.Name, command.Describe)
+	} else {
+		showBranchInfo()
+	}
+
 	return nil
 }
 
@@ -71,7 +78,7 @@ func (command *BranchCommand) setBranchDescribe(name, desc string) {
 	}
 	wd, err := os.Getwd()
 	if err != nil {
-		tools.Println("cannot get current branch info, error : "+err.Error(), tools.Red)
+		tools.Println("cannot get path info, error : "+err.Error(), tools.Red)
 		return
 	}
 
@@ -105,4 +112,36 @@ func (command *BranchCommand) setBranchDescribe(name, desc string) {
 	if err != nil {
 		tools.Println("branch set desc error : "+err.Error(), tools.Red)
 	}
+}
+
+func showBranchInfo() {
+	wd, err := os.Getwd()
+	if err != nil {
+		tools.Println("cannot get path info, error : "+err.Error(), tools.Red)
+		return
+	}
+
+	exist, folderPath, _ := FindDotGitToolsFolder(wd)
+
+	if !exist {
+		return
+	}
+
+	recoedBranchInfo, err := LoadGitToolsBranchInfo(folderPath)
+
+	if err != nil {
+		tools.Println("git-tools info is error,please execute 'verify' \n error info : "+err.Error(), tools.Red)
+		return
+	}
+
+	showMap := make(map[string]interface{})
+	showMap["branch"] = recoedBranchInfo.Branches
+	showMap["group"] = recoedBranchInfo.BranchGroups
+
+	jsonByte, err := json.MarshalIndent(showMap, "", " ")
+	if err != nil {
+		return
+	}
+
+	fmt.Println(string(jsonByte))
 }
