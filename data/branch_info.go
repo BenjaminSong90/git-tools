@@ -9,15 +9,15 @@ type BranchInfo struct {
 }
 
 type Branch struct {
-	Name     string `json:"name"`
-	Describe string `json:"describe"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type BranchGroup struct {
-	Name     string   `json:"name"`
-	Describe string   `json:"describe"`
-	Owner    string   `json:"owner"`
-	Branches []string `json:"branches"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Owner       string   `json:"owner"`
+	Branches    []string `json:"branches"`
 }
 
 // 检查分支，移除不存在的分支
@@ -46,8 +46,8 @@ func (branchInfo *BranchInfo) VerifyBranch(newBranches *[]string) {
 			notDeletedBranches = append(notDeletedBranches, ndb)
 		} else {
 			notDeletedBranches = append(notDeletedBranches, Branch{
-				Name:     b,
-				Describe: "",
+				Name:        b,
+				Description: "",
 			})
 		}
 	}
@@ -94,7 +94,7 @@ func (branchInfo *BranchInfo) SetBranchDesc(name, desc string) {
 	for i := range branchInfo.Branches {
 		b := &branchInfo.Branches[i]
 		if b.Name == name {
-			b.Describe = desc
+			b.Description = desc
 		}
 	}
 }
@@ -109,7 +109,7 @@ func (group *BranchGroup) addBranch(branchName ...string) {
 func (branchInfo *BranchInfo) SetGroupDesc(name, desc string) {
 	groupMap := *branchInfo.getGroupMap()
 	if groupP, ok := groupMap[name]; ok {
-		groupP.Describe = desc
+		groupP.Description = desc
 	}
 }
 
@@ -127,7 +127,7 @@ func (branchInfo *BranchInfo) CreateGroup(name, owner string, branches []string)
 	validBranch := []string{}
 
 	for _, b := range branches {
-		if _, ok := branchNameMap[owner]; ok {
+		if _, ok := branchNameMap[b]; ok && b != owner {
 			validBranch = append(validBranch, b)
 		}
 	}
@@ -136,10 +136,10 @@ func (branchInfo *BranchInfo) CreateGroup(name, owner string, branches []string)
 		groupP.addBranch(validBranch...)
 	} else {
 		branchInfo.BranchGroups = append(branchInfo.BranchGroups, BranchGroup{
-			Name:     name,
-			Owner:    owner,
-			Branches: validBranch,
-			Describe: "",
+			Name:        name,
+			Owner:       owner,
+			Branches:    validBranch,
+			Description: "",
 		})
 	}
 

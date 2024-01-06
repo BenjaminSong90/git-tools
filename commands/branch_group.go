@@ -3,15 +3,15 @@ package commands
 import "github.com/BenjaminSong90/git-tools/tools"
 
 type BranchGroupCommand struct {
-	Owner    string   `long:"create" description:"create group, need follow owner branch name"`
-	Name     string   `long:"name" description:"group name"`
-	Branches []string `long:"branches" description:"branch list for add or remove"`
-	Describe string   `long:"describe" description:"group describe"`
+	Owner       string   `long:"create" short:"c" description:"create group, need follow owner branch name"`
+	Name        string   `long:"name" short:"n" description:"group name"`
+	Branches    []string `long:"branches" short:"b" description:"branch list for add or remove"`
+	Description string   `long:"description" short:"d" description:"group describe"`
 }
 
 func (command *BranchGroupCommand) Execute(args []string) error {
 	command.create(command.Name, command.Owner, command.Branches)
-	command.setDesc(command.Name, command.Describe)
+	command.setDesc(command.Name, command.Description)
 	return nil
 }
 

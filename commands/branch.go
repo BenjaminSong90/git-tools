@@ -10,18 +10,18 @@ import (
 )
 
 type BranchCommand struct {
-	Verify   func() `long:"verify"`
-	Describe string `long:"describe" description:"branch describe" default:""`
-	Name     string `long:"name" description:"branch name" default:""`
+	Verify      func() `long:"verify"`
+	Description string `long:"description" short:"d" description:"branch describe"`
+	Name        string `long:"name" short:"n" description:"branch name"`
 
 	hasCommandExec bool
 }
 
 func (command *BranchCommand) Execute(args []string) error {
 
-	if command.Describe != "" || command.Name != "" {
+	if command.Description != "" || command.Name != "" {
 		command.hasCommandExec = true
-		setBranchDescribe(command.Name, command.Describe)
+		setBranchDescription(command.Name, command.Description)
 	}
 
 	if !command.hasCommandExec {
@@ -81,7 +81,7 @@ func branchVerify() {
 }
 
 // 设置分支描述
-func setBranchDescribe(name, desc string) {
+func setBranchDescription(name, desc string) {
 	if name == "" && desc == "" {
 		return
 	}
