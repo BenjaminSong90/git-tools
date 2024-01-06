@@ -6,10 +6,12 @@ type BranchGroupCommand struct {
 	Owner    string   `long:"create" description:"create group, need follow owner branch name"`
 	Name     string   `long:"name" description:"group name"`
 	Branches []string `long:"branches" description:"branch list for add or remove"`
+	Describe string   `long:"describe" description:"group describe"`
 }
 
 func (command *BranchGroupCommand) Execute(args []string) error {
 	command.create(command.Name, command.Owner, command.Branches)
+	command.setDesc(command.Name, command.Describe)
 	return nil
 }
 
@@ -44,6 +46,28 @@ func (command *BranchGroupCommand) create(name string, ownerName string, branche
 
 	if err != nil {
 		tools.Println("create group error : "+err.Error(), tools.Red)
+	}
+
+}
+
+func (command *BranchGroupCommand) setDesc(name string, desc string) {
+
+	if name == "" || desc == "" {
+		return
+	}
+
+	branchInfo, gitToolsFolderPath, err := getValidBranchInfoAndPath()
+
+	if err != nil {
+		return
+	}
+
+	branchInfo.SetGroupDesc(name, desc)
+
+	err = WirteGitToolsBranchInfo(branchInfo, gitToolsFolderPath)
+
+	if err != nil {
+		tools.Println("set group desc error : "+err.Error(), tools.Red)
 	}
 
 }

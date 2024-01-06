@@ -102,11 +102,20 @@ func (branchInfo *BranchInfo) SetBranchDesc(name, desc string) {
 // 向group添加 branch, 会掉重复的
 func (group *BranchGroup) addBranch(branchName ...string) {
 	group.Branches = append(group.Branches, branchName...)
-	group.Branches = removeDuplicates(group.Branches)
+	group.Branches = RemoveDuplicates(group.Branches)
+}
+
+// 创建group
+func (branchInfo *BranchInfo) SetGroupDesc(name, desc string) {
+	groupMap := *branchInfo.getGroupMap()
+	if groupP, ok := groupMap[name]; ok {
+		groupP.Describe = desc
+	}
 }
 
 // 创建group
 func (branchInfo *BranchInfo) CreateGroup(name, owner string, branches []string) error {
+	branches = RemoveDuplicates(branches)
 	branchNameMap := *branchInfo.getBranchNameMap()
 
 	if _, ok := branchNameMap[owner]; !ok {
@@ -157,7 +166,7 @@ func (branchInfo *BranchInfo) getGroupMap() *map[string]*BranchGroup {
 	return &branchNameMap
 }
 
-func removeDuplicates(strings []string) []string {
+func RemoveDuplicates(strings []string) []string {
 	encountered := map[string]bool{}
 	result := []string{}
 
