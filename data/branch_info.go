@@ -147,6 +147,34 @@ func (branchInfo *BranchInfo) CreateGroup(name, owner string, branches []string)
 
 }
 
+func (branchInfo *BranchInfo) RemoveBranchFromGroup(groupName string, branches []string) {
+	branches = RemoveDuplicates(branches)
+
+	willDeleteBranchMap := make(map[string]bool)
+	for _, b := range branches {
+		willDeleteBranchMap[b] = true
+	}
+
+	groupMap := branchInfo.getGroupMap()
+
+	groupP, ok := groupMap[groupName]
+
+	if !ok {
+		return
+	}
+
+	resultBranch := []string{}
+
+	for _, b := range groupP.Branches {
+		if _, ok := willDeleteBranchMap[b]; !ok {
+			resultBranch = append(resultBranch, b)
+		}
+	}
+
+	groupP.Branches = resultBranch
+
+}
+
 func (branchInfo *BranchInfo) AddBranchToGroup(groupName string, branches []string) {
 	branches = RemoveDuplicates(branches)
 
