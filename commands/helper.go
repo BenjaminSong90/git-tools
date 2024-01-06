@@ -47,7 +47,7 @@ func InitGitToolsBranchInfoFile(rootDirPath string) error {
 
 	branchInfo := data.BranchInfo{
 		Version:      tools.BranchInfoVersion,
-		Branches:     branches,
+		Branches:     *branches,
 		BranchGroups: []data.BranchGroup{},
 	}
 
@@ -55,17 +55,18 @@ func InitGitToolsBranchInfoFile(rootDirPath string) error {
 }
 
 // 获取本地的git branch 信息
-func getLocalBranches() ([]data.Branch, error) {
+func getLocalBranches() (*[]data.Branch, error) {
 	localBranches, err := executer.GetLocalAllBranch()
 
 	if err != nil {
 		return nil, err
 	}
-	if len(localBranches) == 0 {
-		emtpy := []data.Branch{}
-		return emtpy, nil
-	}
+
 	branches := []data.Branch{}
+	if len(localBranches) == 0 {
+		return &branches, nil
+	}
+
 	for _, b := range localBranches {
 		bd := data.Branch{
 			Name: b,
@@ -73,5 +74,19 @@ func getLocalBranches() ([]data.Branch, error) {
 		branches = append(branches, bd)
 	}
 
-	return branches, nil
+	return &branches, nil
+}
+
+// 检查git 和 git是否初始化
+func VerifyGitToolsEnv(path string) bool {
+	gitExist, _, _ := FindDotGitFolder(path)
+	if !gitExist {
+		tools.Println("Please initialize git first! \n : git init", tools.Red)
+		return false
+	}
+	gitToolsExits, _, _ := FindDotGitToolsFolder(path)
+	if !gitToolsExits {
+		tools.Println("Please initialize git-tools first! \n git-tools init", tools.Red)
+	}
+	return gitToolsExits
 }
