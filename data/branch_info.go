@@ -20,6 +20,14 @@ type BranchGroup struct {
 	Branches    []string `json:"branches"`
 }
 
+func (branch *Branch) GetDescOrDefault(d string) string {
+	if len(branch.Description) == 0 {
+		return d
+	}
+
+	return branch.Description
+}
+
 // 检查分支，移除不存在的分支
 func (branchInfo *BranchInfo) Verify(newBranches *[]string) {
 	branchInfo.VerifyBranch(newBranches)

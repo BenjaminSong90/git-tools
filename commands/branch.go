@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -144,14 +143,36 @@ func showBranchInfo() {
 		return
 	}
 
-	showMap := make(map[string]interface{})
-	showMap["branch"] = recoedBranchInfo.Branches
-	showMap["group"] = recoedBranchInfo.BranchGroups
-
-	jsonByte, err := json.MarshalIndent(showMap, "", " ")
+	// showMap := make(map[string]interface{})
+	cbn, err := executer.GetCurrentBranch()
 	if err != nil {
+		tools.Println("read git info error : "+err.Error(), tools.Red)
 		return
 	}
 
-	fmt.Println(string(jsonByte))
+	tools.Println("|-------------------------> branch <-------------------------", tools.Yellow)
+	tools.Println("|", tools.Yellow)
+	for _, b := range recoedBranchInfo.Branches {
+		tools.Println("|", tools.Yellow)
+		if cbn == b.Name {
+			fmt.Printf(tools.Yellow.FormatTextColor("|")+" %s\n", tools.Green.FormatTextColor(fmt.Sprintf("- * %s : %s ", b.Name, b.GetDescOrDefault("--"))))
+		} else {
+			tools.Println(fmt.Sprintf("|- %s : %s", b.Name, b.GetDescOrDefault("--")), tools.Yellow)
+		}
+		tools.Println("|", tools.Yellow)
+
+	}
+
+	tools.Println("|", tools.Yellow)
+	tools.Println("|------------------------------------------------------------", tools.Yellow)
+
+	// showMap["branch"] = recoedBranchInfo.Branches
+	// showMap["group"] = recoedBranchInfo.BranchGroups
+
+	// jsonByte, err := json.MarshalIndent(showMap, "", " ")
+	// if err != nil {
+	// 	return
+	// }
+
+	// fmt.Println(string(jsonByte))
 }

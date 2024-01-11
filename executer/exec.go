@@ -6,7 +6,7 @@ import (
 
 // 获取本地的分支
 func GetLocalAllBranch() ([]string, error) {
-	resultByte, err := ExecuteCommand("git branch").Output()
+	resultByte, err := ExecuteCommand("git", "branch").Output()
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func GetLocalAllBranch() ([]string, error) {
 
 // 获取当前分支
 func GetCurrentBranch() (string, error) {
-	resultByte, err := ExecuteCommand("git branch --show-current").Output()
+	resultByte, err := ExecuteCommand("git", "branch", "--show-current").Output()
 	if err != nil {
 		return "", err
 	}
